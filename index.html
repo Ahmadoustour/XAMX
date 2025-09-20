@@ -12,7 +12,8 @@
             --accent-color: #f72585;
             --light-color: #f8f9fa;
             --dark-color: #212529;
-            --success-color: #4cc9f0;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
             --border-radius: 12px;
             --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
@@ -26,7 +27,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
+            background: linear-gradient(135deg, #a7c7ff 0%, #7eb0ff 100%);
             color: var(--dark-color);
             line-height: 1.6;
             padding: 20px;
@@ -42,14 +43,14 @@
             text-align: center;
             margin-bottom: 30px;
             padding: 25px 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
         
         header h1 {
             color: var(--primary-color);
-            font-size: 2.3rem;
+            font-size: 2.8rem;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -149,7 +150,7 @@
         
         .btn {
             display: inline-block;
-            background-color: var(--primary-color);
+            background-color: var(--error-color);
             color: white;
             padding: 15px 30px;
             border: none;
@@ -164,7 +165,7 @@
         }
         
         .btn:hover {
-            background-color: var(--secondary-color);
+            opacity: 0.9;
             transform: translateY(-2px);
         }
         
@@ -172,6 +173,10 @@
             background-color: #ccc;
             cursor: not-allowed;
             transform: none;
+        }
+        
+        .btn-ready {
+            background-color: var(--success-color);
         }
         
         .btn-convert {
@@ -249,6 +254,20 @@
             border-bottom: 2px solid #eee;
         }
         
+        .download-message {
+            text-align: center;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            color: #2e7d32;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
         #pdfPages, #imagePreviews {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -279,7 +298,7 @@
             display: block;
             text-align: center;
             padding: 12px;
-            background-color: var(--success-color);
+            background-color: var(--primary-color);
             color: white;
             text-decoration: none;
             font-weight: 600;
@@ -287,7 +306,7 @@
         }
         
         .download-link:hover {
-            background-color: #3a86ff;
+            background-color: var(--secondary-color);
         }
         
         .hidden {
@@ -316,40 +335,22 @@
         }
         
         .notification.error {
-            background-color: #e63946;
-        }
-        
-        .debug-info {
-            background: #f8f9fa;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .debug-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--secondary-color);
+            background-color: var(--error-color);
         }
         
         footer {
             text-align: center;
             margin-top: 50px;
             padding: 25px;
-            color: #666;
+            color: #fff;
             font-size: 0.95rem;
-            background: white;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
         }
         
         @media (max-width: 768px) {
             header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             
             .tab {
@@ -366,7 +367,7 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-exchange-alt"></i> محول الصور وPDF</h1>
+            <h1>صور <i class="fas fa-exchange-alt"></i> PDF</h1>
             <p>أداة متكاملة لتحويل مستندات PDF إلى صور متعددة، أو دمج عدة صور إلى مستند PDF واحد بجودة عالية</p>
         </header>
         
@@ -406,7 +407,7 @@
                 </div>
             </div>
             
-            <button id="convertPdfToImages" class="btn btn-convert" disabled>
+            <button id="convertPdfToImages" class="btn" disabled>
                 <i class="fas fa-sync-alt"></i> تحويل PDF إلى صور
             </button>
         </div>
@@ -439,18 +440,18 @@
                 </div>
             </div>
             
-            <button id="convertImagesToPdf" class="btn btn-convert" disabled>
+            <button id="convertImagesToPdf" class="btn" disabled>
                 <i class="fas fa-sync-alt"></i> تحويل الصور إلى PDF
             </button>
-
-            <div class="debug-info">
-                <div class="debug-title">معلومات التصحيح:</div>
-                <div id="debugMessages"></div>
-            </div>
         </div>
         
         <div id="resultsSection" class="results hidden">
             <h2><i class="fas fa-download"></i> نتائج التحويل</h2>
+            <div class="download-message">
+                <i class="fas fa-arrow-down"></i>
+                <span>انزل إلى الأسفل لتنزيل الملفات</span>
+                <i class="fas fa-arrow-down"></i>
+            </div>
             <div id="resultsContent"></div>
         </div>
         
@@ -486,19 +487,10 @@
         const tabs = document.querySelectorAll('.tab');
         const pdfToImageSection = document.getElementById('pdf-to-image');
         const imageToPdfSection = document.getElementById('image-to-pdf');
-        const debugMessages = document.getElementById('debugMessages');
         
         // متغيرات التطبيق
         let uploadedPdfFile = null;
         let uploadedImageFiles = [];
-        
-        // إضافة رسالة تصحيح
-        function addDebugMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
-            debugMessages.appendChild(messageElement);
-            debugMessages.scrollTop = debugMessages.scrollHeight;
-        }
         
         // تبديل التبويبات
         tabs.forEach(tab => {
@@ -520,8 +512,6 @@
         
         // تهيئة منطقة السحب والإفلات
         function initDropAreas() {
-            addDebugMessage('تهيئة مناطق السحب والإفلات');
-            
             // لمنع السلوك الافتراضي للمتصفح عند السحب
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 [pdfDropArea, imagesDropArea].forEach(area => {
@@ -554,8 +544,6 @@
             // تغيير الملفات المحددة عبر المدخلات
             pdfFileInput.addEventListener('change', handlePdfSelect);
             imageFilesInput.addEventListener('change', handleImagesSelect);
-            
-            addDebugMessage('تم تهيئة مناطق السحب والإفلات بنجاح');
         }
         
         function preventDefaults(e) {
@@ -572,7 +560,6 @@
         }
         
         function handlePdfDrop(e) {
-            addDebugMessage('تم سحب ملف PDF');
             const dt = e.dataTransfer;
             const files = dt.files;
             if (files.length > 0 && files[0].type === 'application/pdf') {
@@ -580,12 +567,10 @@
                 handlePdfSelect();
             } else {
                 showNotification('يرجى إسقاط ملف PDF صحيح', 'error');
-                addDebugMessage('لم يتم إسقاط ملف PDF صحيح');
             }
         }
         
         function handleImagesDrop(e) {
-            addDebugMessage('تم سحب ملفات صور');
             const dt = e.dataTransfer;
             const files = dt.files;
             if (files.length > 0 && Array.from(files).every(file => file.type.startsWith('image/'))) {
@@ -593,7 +578,6 @@
                 handleImagesSelect();
             } else {
                 showNotification('يرجى إسقاط ملفات صور فقط', 'error');
-                addDebugMessage('لم يتم إسقاط ملفات صور صحيحة');
             }
         }
         
@@ -603,9 +587,9 @@
                 const fileName = uploadedPdfFile.name;
                 pdfDropArea.querySelector('.file-msg').textContent = fileName;
                 convertPdfToImagesBtn.disabled = false;
+                convertPdfToImagesBtn.classList.add('btn-ready');
                 
                 showNotification(`تم تحميل ملف PDF: ${fileName}`);
-                addDebugMessage(`تم تحميل ملف PDF: ${fileName} (${uploadedPdfFile.size} بايت)`);
             }
         }
         
@@ -616,14 +600,9 @@
                 imagesDropArea.querySelector('.file-msg').textContent = 
                     `${fileCount} ملف${fileCount > 1 ? 'ات' : ''} محدد${fileCount > 1 ? 'ة' : ''}`;
                 convertImagesToPdfBtn.disabled = false;
+                convertImagesToPdfBtn.classList.add('btn-ready');
                 
                 showNotification(`تم تحميل ${fileCount} صورة`);
-                addDebugMessage(`تم تحميل ${fileCount} صورة`);
-                
-                // عرض معلومات عن كل صورة
-                uploadedImageFiles.forEach((file, index) => {
-                    addDebugMessage(`الصورة ${index + 1}: ${file.name} (${file.type}, ${file.size} بايت)`);
-                });
             }
         }
         
@@ -642,11 +621,9 @@
             try {
                 convertPdfToImagesBtn.disabled = true;
                 convertPdfToImagesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
-                addDebugMessage('بدء تحويل PDF إلى صور');
                 
                 const typedarray = new Uint8Array(await uploadedPdfFile.arrayBuffer());
                 const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                addDebugMessage(`تم تحميل PDF يحتوي على ${pdf.numPages} صفحة`);
                 
                 resultsContent.innerHTML = `
                     <div class="results-header">
@@ -659,7 +636,6 @@
                 pdfPagesContainer.innerHTML = '';
                 
                 for (let i = 1; i <= pdf.numPages; i++) {
-                    addDebugMessage(`جاري تحويل الصفحة ${i} من ${pdf.numPages}`);
                     const page = await pdf.getPage(i);
                     const viewport = page.getViewport({ scale: 1.5 });
                     const canvas = document.createElement('canvas');
@@ -692,17 +668,18 @@
                     
                     pageContainer.appendChild(downloadLink);
                     pdfPagesContainer.appendChild(pageContainer);
-                    
-                    addDebugMessage(`تم تحويل الصفحة ${i} بنجاح`);
                 }
                 
                 resultsSection.classList.remove('hidden');
                 showNotification(`تم تحويل PDF إلى ${pdf.numPages} صور بنجاح`);
-                addDebugMessage('اكتمل تحويل PDF إلى صور بنجاح');
+                
+                // التمرير إلى قسم النتائج
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
             } catch (error) {
                 console.error('Error converting PDF to images:', error);
                 showNotification('حدث خطأ أثناء تحويل PDF إلى صور', 'error');
-                addDebugMessage(`خطأ في تحويل PDF: ${error.message}`);
             } finally {
                 convertPdfToImagesBtn.disabled = false;
                 convertPdfToImagesBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحويل PDF إلى صور';
@@ -713,14 +690,12 @@
         convertImagesToPdfBtn.addEventListener('click', async () => {
             if (!uploadedImageFiles || uploadedImageFiles.length === 0) {
                 showNotification('يرجى اختيار صورة واحدة على الأقل', 'error');
-                addDebugMessage('لم يتم اختيار أي صور للتحويل');
                 return;
             }
             
             try {
                 convertImagesToPdfBtn.disabled = true;
                 convertImagesToPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
-                addDebugMessage('بدء تحويل الصور إلى PDF');
                 
                 // التحقق من توفر مكتبة jsPDF
                 if (typeof window.jspdf === 'undefined') {
@@ -733,8 +708,6 @@
                     unit: 'mm',
                     format: pdfSizeSelect.value
                 });
-                
-                addDebugMessage(`تم إنشاء مستند PDF جديد بحجم ${pdfSizeSelect.value}`);
                 
                 resultsContent.innerHTML = `
                     <div class="results-header">
@@ -751,7 +724,6 @@
                 
                 for (let i = 0; i < sortedFiles.length; i++) {
                     const file = sortedFiles[i];
-                    addDebugMessage(`جاري معالجة الصورة ${i+1}: ${file.name}`);
                     
                     const img = new Image();
                     const objectUrl = URL.createObjectURL(file);
@@ -762,12 +734,9 @@
                         img.src = objectUrl;
                     });
                     
-                    addDebugMessage(`تم تحميل الصورة ${i+1}: ${img.width}×${img.height} بكسل`);
-                    
                     // إضافة صفحة جديدة للصور بعد الأولى
                     if (i > 0) {
                         doc.addPage();
-                        addDebugMessage(`تم إضافة صفحة جديدة للصورة ${i+1}`);
                     }
                     
                     // حساب أبعاد الصورة لتناسب الصفحة
@@ -787,8 +756,6 @@
                     const x = (pageWidth - imgWidth) / 2;
                     const y = (pageHeight - imgHeight) / 2;
                     
-                    addDebugMessage(`إضافة الصورة إلى PDF بالإحداثيات: x=${x}, y=${y}, width=${imgWidth}, height=${imgHeight}`);
-                    
                     // إضافة الصورة إلى PDF
                     doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight);
                     
@@ -805,8 +772,6 @@
                     
                     // تحرير الذاكرة
                     URL.revokeObjectURL(objectUrl);
-                    
-                    addDebugMessage(`تمت إضافة الصورة ${i+1} إلى PDF بنجاح`);
                 }
                 
                 // إنشاء رابط لتحميل PDF
@@ -827,11 +792,14 @@
                 resultsSection.classList.remove('hidden');
                 
                 showNotification('تم تحويل الصور إلى PDF بنجاح');
-                addDebugMessage('اكتمل تحويل الصور إلى PDF بنجاح');
+                
+                // التمرير إلى قسم النتائج
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
             } catch (error) {
                 console.error('Error converting images to PDF:', error);
                 showNotification('حدث خطأ أثناء تحويل الصور إلى PDF', 'error');
-                addDebugMessage(`خطأ في تحويل الصور إلى PDF: ${error.message}`);
             } finally {
                 convertImagesToPdfBtn.disabled = false;
                 convertImagesToPdfBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحويل الصور إلى PDF';
@@ -859,24 +827,8 @@
         
         // تهيئة التطبيق عند تحميل الصفحة
         window.addEventListener('DOMContentLoaded', () => {
-            addDebugMessage('تم تحميل الصفحة بنجاح');
-            addDebugMessage('جاري تهيئة التطبيق...');
             initDropAreas();
             showNotification('مرحبًا بك في محول PDF والصور!');
-            addDebugMessage('التطبيق جاهز للاستخدام');
-            
-            // التحقق من توفر المكتبات
-            if (typeof pdfjsLib !== 'undefined') {
-                addDebugMessage('مكتبة PDF.js محملة بنجاح');
-            } else {
-                addDebugMessage('تحذير: مكتبة PDF.js غير محملة');
-            }
-            
-            if (typeof window.jspdf !== 'undefined') {
-                addDebugMessage('مكتبة jsPDF محملة بنجاح');
-            } else {
-                addDebugMessage('تحذير: مكتبة jsPDF غير محملة');
-            }
         });
     </script>
 </body>
