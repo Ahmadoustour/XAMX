@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محول الصور وPDF - تحويل بين الصور وPDF بسهولة</title>
+    <title>محول الصور وPDF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -50,12 +50,12 @@
         
         header h1 {
             color: var(--primary-color);
-            font-size: 2.8rem;
+            font-size: 3.5rem;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
         }
         
         header p {
@@ -254,20 +254,6 @@
             border-bottom: 2px solid #eee;
         }
         
-        .download-message {
-            text-align: center;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-radius: var(--border-radius);
-            margin: 20px 0;
-            color: #2e7d32;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
         #pdfPages, #imagePreviews {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -350,7 +336,7 @@
         
         @media (max-width: 768px) {
             header h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             
             .tab {
@@ -367,7 +353,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>صور <i class="fas fa-exchange-alt"></i> PDF</h1>
+            <h1><i class="fas fa-image"></i> <i class="fas fa-exchange-alt"></i> <i class="fas fa-file-pdf"></i></h1>
             <p>أداة متكاملة لتحويل مستندات PDF إلى صور متعددة، أو دمج عدة صور إلى مستند PDF واحد بجودة عالية</p>
         </header>
         
@@ -447,16 +433,11 @@
         
         <div id="resultsSection" class="results hidden">
             <h2><i class="fas fa-download"></i> نتائج التحويل</h2>
-            <div class="download-message">
-                <i class="fas fa-arrow-down"></i>
-                <span>انزل إلى الأسفل لتنزيل الملفات</span>
-                <i class="fas fa-arrow-down"></i>
-            </div>
             <div id="resultsContent"></div>
         </div>
         
         <footer>
-            <p>© 2023 محول PDF و الصور. جميع الحقوق محفوظة. | تم التصميم بلغة HTML و CSS و JavaScript</p>
+            <p>© 2023 محول الصور وPDF. جميع الحقوق محفوظة.</p>
         </footer>
     </div>
     
@@ -828,7 +809,7 @@
         // تهيئة التطبيق عند تحميل الصفحة
         window.addEventListener('DOMContentLoaded', () => {
             initDropAreas();
-            showNotification('مرحبًا بك في محول PDF والصور!');
+            showNotification('مرحبًا بك في محول الصور وPDF!');
         });
     </script>
 </body>
